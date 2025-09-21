@@ -37,6 +37,8 @@ export function TeamMemberList() {
   const [isInviteOpen, setIsInviteOpen] = useState(false)
   const [editingMember, setEditingMember] = useState<any>(null)
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  
   const { selectedStore, isLoading } = useStore()
 
   const storeId = selectedStore?._id as Id<"stores">
@@ -151,6 +153,9 @@ export function TeamMemberList() {
       </Card>
     )
   }
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
 
   if (!selectedStore) {
     return (
@@ -193,7 +198,7 @@ export function TeamMemberList() {
             Gerencie membros da loja: <span className="font-medium">{selectedStore.name}</span>
           </p>
         </div>
-        {can("create", "users") && (
+        {can(userRole,"create", "users") && (
           <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -327,7 +332,7 @@ export function TeamMemberList() {
                   </TableCell>
                   <TableCell>{new Date(member.invitedAt).toLocaleDateString("pt-BR")}</TableCell>
                   <TableCell>
-                    {can("update", "users") && (
+                    {can(userRole,"update", "users") && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

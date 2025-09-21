@@ -19,6 +19,8 @@ import {
   Hash,
   Store,
 } from "lucide-react"
+import { useStore } from "@/contexts/store-context"
+
 
 const navigation = [
   {
@@ -119,7 +121,11 @@ const attributesNav = [
 
 export function AdminSidebar() {
   const pathname = usePathname()
+  const { userRole } = useStore()
   const { can } = usePermissions()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
 
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r">
@@ -129,7 +135,7 @@ export function AdminSidebar() {
 
       <nav className="flex-1 space-y-1 px-3 py-4">
         {navigation.map((item) => {
-          if (!can("superadmin", item.action, item.resource)) return null
+          if (!can(userRole, item.action, item.resource)) return null
 
           return (
             <Link
@@ -152,7 +158,7 @@ export function AdminSidebar() {
           <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Atributos</h3>
           <div className="mt-2 space-y-1">
             {attributesNav.map((item) => {
-              if (!can("superadmin", item.action, item.resource)) return null
+              if (!can(userRole, item.action, item.resource)) return null
 
               return (
                 <Link

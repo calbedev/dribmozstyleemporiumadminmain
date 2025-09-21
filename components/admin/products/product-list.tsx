@@ -29,6 +29,10 @@ export function ProductList() {
   const [search, setSearch] = useState("")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
   const { toast } = useToast()
 
   const storeId = selectedStore?._id as Id<"stores">
@@ -141,7 +145,7 @@ export function ProductList() {
             Gerencie os produtos da loja: <span className="font-medium">{selectedStore.name}</span>
           </p>
         </div>
-        {can("write", "products") && (
+        {can(userRole,"write", "products") && (
           <Button asChild>
             <Link href="/admin/products/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -258,7 +262,7 @@ export function ProductList() {
                             Ver
                           </Link>
                         </DropdownMenuItem>
-                        {can("write", "products") && (
+                        {can(userRole,"write", "products") && (
                           <>
                             <DropdownMenuItem asChild>
                               <Link href={`/admin/products/${product._id}/edit`}>
@@ -282,7 +286,7 @@ export function ProductList() {
                             </DropdownMenuItem>
                           </>
                         )}
-                        {can("delete", "products") && (
+                        {can(userRole,"delete", "products") && (
                           <>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => handleDelete(product._id)} className="text-destructive">

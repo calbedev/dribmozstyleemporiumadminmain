@@ -20,10 +20,15 @@ import { usePermissions } from "@/components/admin/permission-guard"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Tag, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
+import { useStore } from "@/contexts/store-context"
 
 export function BrandList() {
   const [search, setSearch] = useState("")
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
   const { toast } = useToast()
 
   const brands = useQuery(api.adminbrands.list, { search: search || undefined })
@@ -72,7 +77,7 @@ export function BrandList() {
           <h1 className="text-3xl font-bold tracking-tight">Marcas</h1>
           <p className="text-muted-foreground">Gerencie as marcas dos seus produtos</p>
         </div>
-        {can("write", "brands") && (
+        {can(userRole,"write", "brands") && (
           <Button asChild>
             <Link href="/admin/brands/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -163,7 +168,7 @@ export function BrandList() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        {can("write", "brands") && (
+                        {can(userRole,"write", "brands") && (
                           <>
                             <DropdownMenuItem asChild>
                               <Link href={`/admin/brands/${brand._id}/edit`}>
@@ -174,7 +179,7 @@ export function BrandList() {
                             <DropdownMenuSeparator />
                           </>
                         )}
-                        {can("delete", "brands") && (
+                        {can(userRole,"delete", "brands") && (
                           <DropdownMenuItem onClick={() => handleDelete(brand._id)} className="text-destructive">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Excluir

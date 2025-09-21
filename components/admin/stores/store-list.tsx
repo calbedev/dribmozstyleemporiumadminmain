@@ -29,12 +29,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { usePermissions } from "@/components/admin/permission-guard"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Store, Users, Globe, Mail, Phone } from "lucide-react"
 import { toast } from "sonner"
+import { useStore } from "@/contexts/store-context"
 
 export function StoreList() {
   const [search, setSearch] = useState("")
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editingStore, setEditingStore] = useState<any>(null)
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  
 
   const stores = useQuery(api.adminstores.listStores, { search: search || undefined })
 
@@ -143,6 +146,9 @@ export function StoreList() {
       </Card>
     )
   }
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
 
   return (
     <div className="space-y-6">
@@ -151,7 +157,7 @@ export function StoreList() {
           <h1 className="text-3xl font-bold tracking-tight">Lojas</h1>
           <p className="text-muted-foreground">Gerencie todas as lojas da plataforma</p>
         </div>
-        {can("create", "stores") && (
+        {can(userRole,"create", "stores") && (
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -331,7 +337,7 @@ export function StoreList() {
                   </TableCell>
                   <TableCell>{new Date(store.createdAt).toLocaleDateString("pt-BR")}</TableCell>
                   <TableCell>
-                    {can("update", "stores") && (
+                    {can(userRole,"update", "stores") && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">

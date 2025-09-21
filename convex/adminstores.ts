@@ -140,11 +140,15 @@ export const getUserStores = query({
   args: { userId: v.string() },
   handler: async (ctx, { userId }) => {
     // 1. Confirma se o user existe em users_sync
-    const usery = "787cb2fc-e7a8-489a-b137-6463621d570d"
+    console.log("Buscando lojas para o userId:", userId);
+    //const user = await ctx.db
+    //  .query("users_sync")
+    //  .withIndex("by_userId", (q) => q.eq("userId", userId))
+    //  .first();
     const user = await ctx.db
       .query("users_sync")
-      .withIndex("by_userId", (q) => q.eq("userId", usery))
-      .first();
+      .filter((q) => q.eq(q.field("userId"), userId))
+      .first()
     console.log("User encontrado", user);
 
     if (!user) {

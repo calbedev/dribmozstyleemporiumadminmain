@@ -32,6 +32,7 @@ import { Switch } from "@/components/ui/switch"
 import { usePermissions } from "@/components/admin/permission-guard"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, Palette } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useStore } from "@/contexts/store-context"
 
 export function ColorsList() {
   const [search, setSearch] = useState("")
@@ -44,6 +45,10 @@ export function ColorsList() {
   })
 
   const { can } = usePermissions()
+  const { userRole } = useStore()
+    if (!userRole) {
+      return <div>Access denied</div>
+    }
   const { toast } = useToast()
 
   const colors = useQuery(api.adminattributes.listColors, { search: search || undefined, isActive: true })
@@ -118,7 +123,7 @@ export function ColorsList() {
           <h1 className="text-3xl font-bold tracking-tight">Cores</h1>
           <p className="text-muted-foreground">Gerencie as cores disponíveis para produtos</p>
         </div>
-        {can("superadmin", "write", "colors") && (
+        {can(userRole, "write", "colors") && (
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={resetForm}>
@@ -241,7 +246,7 @@ export function ColorsList() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        {can("write", "colors") && (
+                        {can(userRole,"write", "colors") && (
                           <>
                             <DropdownMenuItem onClick={() => handleEdit(color)}>
                               <Edit className="mr-2 h-4 w-4" />
@@ -250,7 +255,7 @@ export function ColorsList() {
                             <DropdownMenuSeparator />
                           </>
                         )}
-                        {can("delete", "colors") && (
+                        {can(userRole,"delete", "colors") && (
                           <DropdownMenuItem onClick={() => handleDelete(color._id)} className="text-destructive">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Excluir

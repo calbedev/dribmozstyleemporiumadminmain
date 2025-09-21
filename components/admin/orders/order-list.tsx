@@ -28,13 +28,17 @@ export function OrderList() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [paymentFilter, setPaymentFilter] = useState<string>("all")
-  const { can, user } = usePermissions()
+  const { can } = usePermissions()
+  const { userRole } = useStore()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
   const { selectedStore } = useStore()
   const { toast } = useToast()
 
   const userOrders = useQuery(
     api.adminorders.list,
-    user?.role === "superadmin"
+    userRole === "superadmin"
       ? {
           search: search || undefined,
           status: statusFilter !== "all" ? (statusFilter as any) : undefined,
@@ -52,7 +56,7 @@ export function OrderList() {
     limit: 50,
   })
 
-  const userOrderStats = useQuery(api.adminorders.getStatusStats, user?.role === "superadmin" ? {} : "skip")
+  const userOrderStats = useQuery(api.adminorders.getStatusStats, userRole === "superadmin" ? {} : "skip")
 
   const storeOrderStats = useQuery(api.adminorders.getStoreOrderStatusStats, {
     storeId: selectedStore?._id,
@@ -196,7 +200,7 @@ export function OrderList() {
                     </Link>
                   </DropdownMenuItem>
 
-                  {can("write", "orders") && (
+                  {can(userRole,"write", "orders") && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>Atualizar Status</DropdownMenuLabel>
@@ -290,7 +294,7 @@ export function OrderList() {
     </div>
   )
 
-  if ((userOrders === undefined && user?.role === "superadmin") || storeOrders === undefined) {
+  if ((userOrders === undefined && userRole === "superadmin") || storeOrders === undefined) {
     return (
       <Card>
         <CardHeader>
@@ -313,13 +317,13 @@ export function OrderList() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Pedidos</h1>
         <p className="text-muted-foreground">
-          {user?.role === "superadmin"
+          {userRole === "superadmin"
             ? "Gerencie todos os pedidos do sistema"
             : `Gerencie os pedidos da loja ${selectedStore?.name || ""}`}
         </p>
       </div>
 
-      {user?.role === "superadmin" ? (
+      {userRole === "superadmin" ? (
         <Tabs defaultValue="store-orders" className="space-y-6">
           <TabsList>
             <TabsTrigger value="store-orders" className="flex items-center gap-2">

@@ -19,7 +19,8 @@ import { UserButton, useUser } from "@stackframe/stack"
 export function AdminHeader() {
   //const { user } = usePermissions()
   const user = useUser();
-
+  const { userRole } = useStore()
+  
   const { selectedStore, stores, setSelectedStore, isLoading } = useStore()
   console.log("-----------------DEBUG--------------: Selected Store", selectedStore)
   console.log("-----------------DEBUG--------------: All Stores", stores)
@@ -60,8 +61,8 @@ export function AdminHeader() {
       </div>
 
       <div className="flex items-center space-x-4">
+        <span>{userRole}</span>
         <UserButton/>
-        
       </div>
     </header>
   )

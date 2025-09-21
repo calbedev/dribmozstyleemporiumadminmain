@@ -24,6 +24,7 @@ import { usePermissions } from "@/components/admin/permission-guard"
 import { ArrowLeft, Edit } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
+import { useStore } from "@/contexts/store-context"
 
 interface OrderDetailProps {
   orderId: string
@@ -36,6 +37,10 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const [notes, setNotes] = useState("")
 
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
   const { toast } = useToast()
 
   const order = useQuery(api.adminorders.getById, { id: orderId as any })
@@ -129,7 +134,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
         </div>
 
-        {can("write", "orders") && (
+        {can(userRole,"write", "orders") && (
           <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
             <DialogTrigger asChild>
               <Button>

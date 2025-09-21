@@ -30,7 +30,7 @@ interface StoreContextType {
   setSelectedStore: (store: Store | null) => void
   isLoading: boolean
   hasNoStores: boolean
-  userRole: UserRole 
+  userRole: UserRole | null
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined)
@@ -44,7 +44,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const storesQuery = useQuery(api.adminstores.getUserStores, userId ? { userId } : "skip")
   console.log("Minhas lojas", storesQuery)
-  const userRole = useQuery(api.adminteam.getUserRole, { userId: user?.id, storeId: selectedStore?._id as Id<"stores">})
+  const userRole = useQuery(api.adminteam.getUserRole, userId && selectedStore ? { userId: user.id, storeId: selectedStore._id } : "skip")
   const isLoading = storesQuery === undefined
 
   const stores: Store[] = (storesQuery || []).map((store: any) => ({
@@ -80,7 +80,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSelectedStore,
         isLoading,
         hasNoStores,
-        userRole
+        userRole: userRole as UserRole | null,
       }}
     >
       {children}

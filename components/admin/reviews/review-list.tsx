@@ -31,6 +31,10 @@ export function ReviewList() {
   const [ratingFilter, setRatingFilter] = useState<string>("all")
   const [selectedReviews, setSelectedReviews] = useState<string[]>([])
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
   const { toast } = useToast()
   const { selectedStore, isLoading } = useStore()
 
@@ -228,7 +232,7 @@ export function ReviewList() {
                     <SelectItem value="1">1 estrela</SelectItem>
                   </SelectContent>
                 </Select>
-                {selectedReviews.length > 0 && can("write", "reviews") && (
+                {selectedReviews.length > 0 && can(userRole,"write", "reviews") && (
                   <Button onClick={handleBulkApprove} className="whitespace-nowrap">
                     Aprovar Selecionados ({selectedReviews.length})
                   </Button>
@@ -320,7 +324,7 @@ export function ReviewList() {
                               </Link>
                             </DropdownMenuItem>
 
-                            {can("write", "reviews") && (
+                            {can(userRole,"write", "reviews") && (
                               <>
                                 <DropdownMenuSeparator />
                                 {!review.isApproved && (
@@ -344,7 +348,7 @@ export function ReviewList() {
                               </>
                             )}
 
-                            {can("delete", "reviews") && (
+                            {can(userRole,"delete", "reviews") && (
                               <>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={() => handleDelete(review._id)} className="text-destructive">

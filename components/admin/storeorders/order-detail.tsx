@@ -129,7 +129,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
         </div>
 
-        {can("write", "orders") && (
+        {can(userRole,"write", "orders") && (
           <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
             <DialogTrigger asChild>
               <Button>

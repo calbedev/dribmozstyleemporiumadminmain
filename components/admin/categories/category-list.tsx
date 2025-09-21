@@ -20,10 +20,15 @@ import { usePermissions } from "@/components/admin/permission-guard"
 import { Search, Plus, MoreHorizontal, Edit, Trash2, FolderTree } from "lucide-react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
+import { useStore } from "@/contexts/store-context"
 
 export function CategoryList() {
   const [search, setSearch] = useState("")
   const { can } = usePermissions()
+  const { userRole } = useStore()
+  if (!userRole) {
+    return <div>Access denied</div>
+  }
   const { toast } = useToast()
 
   const categories = useQuery(api.admincategories.list, { search: search || undefined })
@@ -72,7 +77,7 @@ export function CategoryList() {
           <h1 className="text-3xl font-bold tracking-tight">Categorias</h1>
           <p className="text-muted-foreground">Organize seus produtos em categorias</p>
         </div>
-        {can("write", "categories") && (
+        {can(userRole,"write", "categories") && (
           <Button asChild>
             <Link href="/admin/categories/new">
               <Plus className="mr-2 h-4 w-4" />
@@ -151,7 +156,7 @@ export function CategoryList() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        {can("write", "categories") && (
+                        {can(userRole,"write", "categories") && (
                           <>
                             <DropdownMenuItem asChild>
                               <Link href={`/admin/categories/${category._id}/edit`}>
@@ -162,7 +167,7 @@ export function CategoryList() {
                             <DropdownMenuSeparator />
                           </>
                         )}
-                        {can("delete", "categories") && (
+                        {can(userRole,"delete", "categories") && (
                           <DropdownMenuItem onClick={() => handleDelete(category._id)} className="text-destructive">
                             <Trash2 className="mr-2 h-4 w-4" />
                             Excluir
